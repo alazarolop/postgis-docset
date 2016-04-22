@@ -1,7 +1,7 @@
 require 'sqlite3'
 require 'nokogiri'
 
-VERSION = '2.1'
+VERSION = '2.2'
 DOC_URL = "http://postgis.net/docs/manual-#{VERSION}/"
 
 task :default => [
@@ -25,13 +25,13 @@ task :index do
 end
 
 task :add_info_plist do
-  info_plist = Dir.getwd + '/Info.plist'
+  info_plist = Dir.getwd.chomp('/') + '/Info.plist'
   FileUtils.cp info_plist, docset_contents_path
 end
 
 task :copy_icon do
-  icon = Dir.getwd + '/icon.png'
-  FileUtils.cp icon, docset_contents_path + '..'
+  icon = Dir.getwd.chomp('/') + '/icon.png'
+  FileUtils.cp icon, docset_contents_path + '/../'
 end
 
 task :tar do
@@ -41,7 +41,7 @@ end
 private
 
   def docset_contents_path
-    Dir.getwd + '/dist/postgis.docset/Contents/'
+     Dir.getwd.chomp('/') + '/dist/postgis.docset/Contents'
   end
 
   def create_docset_table(db)
