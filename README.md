@@ -1,4 +1,4 @@
-leaflet-docset
+postgis-docset
 ==============
 
 Documentation for [PostGIS](http://postgis.net/) ("a spatial database extender for PostgreSQL object-relational database") in the Dash [docset](http://kapeli.com/docsets) format, ready for offline reading and searching.
