@@ -1,8 +1,9 @@
 require 'sqlite3'
 require 'nokogiri'
 
-VERSION = '2.2'
-DOC_URL = "http://postgis.net/docs/manual-#{VERSION}/"
+VERSION_IN_URL = 'dev'
+VERSION_IN_FILENAME = '2.3.0dev'
+DOC_URL = "http://postgis.net/docs/manual-#{VERSION_IN_URL}/"
 
 task :default => [
   :fetch_docs,
@@ -13,6 +14,7 @@ task :default => [
 ]
 
 task :fetch_docs do
+  Dir.mkdir docset_root_path
   target_dir = docset_contents_path + '/Resources/Documents'
   system "wget --convert-links --page-requisites --recursive --no-parent --cut-dirs=2 -nH --directory-prefix=#{target_dir} #{DOC_URL}"
 end
@@ -26,7 +28,8 @@ end
 
 task :add_info_plist do
   info_plist = Dir.getwd.chomp('/') + '/Info.plist'
-  FileUtils.cp info_plist, docset_contents_path
+  plist_contents = File.read(info_plist).gsub('{VERSION_IN_FILENAME}', VERSION_IN_FILENAME);
+  File.open(docset_contents_path + '/Info.plist', 'w') { |file| file.write(plist_contents) }
 end
 
 task :copy_icon do
@@ -35,13 +38,21 @@ task :copy_icon do
 end
 
 task :tar do
-  system "cd dist && tar --exclude='.DS_Store' -cvzf Postgis.tgz postgis.docset"
+  Dir.chdir "dist"
+  system "7z.exe a -ttar postgis-" + VERSION_IN_FILENAME + ".tar postgis-" + VERSION_IN_FILENAME + ".docset"
+  system "7z.exe a postgis-" + VERSION_IN_FILENAME + ".tgz postgis-" + VERSION_IN_FILENAME + ".tar"
+  File.delete("postgis-" + VERSION_IN_FILENAME + ".tar")
+  Dir.chdir ".."
 end
 
 private
 
+	def docset_root_path 
+     Dir.getwd.chomp('/') + '/dist/postgis-' + VERSION_IN_FILENAME + '.docset'
+	end
+
   def docset_contents_path
-     Dir.getwd.chomp('/') + '/dist/postgis.docset/Contents'
+     docset_root_path + '/Contents'
   end
 
   def create_docset_table(db)
