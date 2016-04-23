@@ -1,1 +1,2 @@
-dist/postgis.docset
+dist/postgis-*.docset
+*.bak
